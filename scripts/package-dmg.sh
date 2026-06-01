@@ -6,7 +6,9 @@ DIST_DIR="$ROOT_DIR/dist"
 STAGING_DIR="$DIST_DIR/dmg-staging"
 DMG_PATH="$DIST_DIR/Paths.dmg"
 
-"$ROOT_DIR/scripts/build.sh"
+if [[ "${SKIP_BUILD:-0}" != "1" ]]; then
+  "$ROOT_DIR/scripts/build.sh"
+fi
 
 rm -rf "$STAGING_DIR" "$DMG_PATH"
 mkdir -p "$STAGING_DIR"

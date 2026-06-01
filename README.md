@@ -37,3 +37,15 @@ This builds the app and copies it to `~/Applications/Paths.app`.
 ## Distribution Status
 
 The current public download is ad-hoc signed but not notarized. A Developer ID signed and notarized release will provide the cleanest Gatekeeper experience.
+
+## Notarized Release
+
+To create a Gatekeeper-friendly public release, install a Developer ID Application certificate and create a notarytool keychain profile, then run:
+
+```sh
+DEVELOPER_ID_APPLICATION="Developer ID Application: Your Name (TEAMID)" \
+NOTARY_KEYCHAIN_PROFILE="paths-notary" \
+./scripts/package-notarized-dmg.sh
+```
+
+Upload the resulting `dist/Paths.dmg` to a GitHub Release.
