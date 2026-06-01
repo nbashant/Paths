@@ -6,6 +6,12 @@ Paste an exact path and press Return to open the folder or reveal the file in Fi
 
 Press Return to open the selected result, or double-click a result row to reveal it in Finder.
 
+## Download
+
+[Download Paths for macOS](https://github.com/nbashant/Paths/releases/latest/download/Paths.dmg)
+
+Open the DMG, then drag `Paths.app` into Applications.
+
 ## Build
 
 Requires macOS with Swift and AppKit available.
@@ -30,4 +36,4 @@ This builds the app and copies it to `~/Applications/Paths.app`.
 
 ## Distribution Status
 
-This repo currently contains source code only. Public binary releases should be Developer ID signed and notarized before being shared broadly.
+The current public download is ad-hoc signed but not notarized. A Developer ID signed and notarized release will provide the cleanest Gatekeeper experience.
