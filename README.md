@@ -1,8 +1,10 @@
 # Paths
 
-Paths is a tiny macOS app for opening Finder directly to a pasted file or folder path.
+Paths is a tiny macOS app for opening Finder directly to a pasted file/folder path or a filename search result.
 
-Paste a path, press Return or click Open, and Paths will either open the folder or reveal the file in Finder.
+Paste an exact path and press Return to open the folder or reveal the file in Finder. Type a filename and Paths shows fast Spotlight-backed suggestions with file icons and modified dates.
+
+Press Return to open the selected result, or double-click a result row to reveal it in Finder.
 
 ## Build
 
