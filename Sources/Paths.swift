@@ -8,6 +8,15 @@ private let metadataReadLimit = 400
 final class SpotlightWindow: NSWindow {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { true }
+
+    override func keyDown(with event: NSEvent) {
+        if event.keyCode == 53 {
+            NSApplication.shared.terminate(nil)
+            return
+        }
+
+        super.keyDown(with: event)
+    }
 }
 
 struct FileSearchResult: Equatable {
@@ -535,6 +544,13 @@ final class PathWindowController: NSWindowController, NSTextFieldDelegate {
         }
 
         showStatus("")
+        closeAfterSuccessfulOpen()
+    }
+
+    private func closeAfterSuccessfulOpen() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(120)) {
+            NSApplication.shared.terminate(nil)
+        }
     }
 
     private func selectResult(at index: Int) {
@@ -579,7 +595,7 @@ final class PathWindowController: NSWindowController, NSTextFieldDelegate {
             moveSelection(delta: -1)
             return true
         case #selector(NSResponder.cancelOperation(_:)):
-            clearSearch()
+            NSApplication.shared.terminate(nil)
             return true
         default:
             return false
@@ -928,7 +944,50 @@ final class PathWindowController: NSWindowController, NSTextFieldDelegate {
     private func pathCandidates(from input: String) -> [String] {
         let unquoted = stripMatchingQuotes(input)
         let unescaped = unescapeBackslashPath(unquoted)
-        return unescaped == unquoted ? [unquoted] : [unquoted, unescaped]
+        let rawCandidates = unescaped == unquoted ? [unquoted] : [unquoted, unescaped]
+        let homePath = FileManager.default.homeDirectoryForCurrentUser.path
+        var candidates: [String] = []
+        var seen = Set<String>()
+
+        func appendCandidate(_ candidate: String) {
+            guard !candidate.isEmpty, seen.insert(candidate).inserted else { return }
+            candidates.append(candidate)
+        }
+
+        for candidate in rawCandidates {
+            appendCandidate(candidate)
+
+            if let rooted = leadingSlashCandidate(from: candidate) {
+                appendCandidate(rooted)
+            }
+
+            if let homeRelative = homeRelativeCandidate(from: candidate, homePath: homePath) {
+                appendCandidate(homeRelative)
+            }
+        }
+
+        return candidates
+    }
+
+    private func leadingSlashCandidate(from input: String) -> String? {
+        guard input.hasPrefix("Users/") else { return nil }
+        return "/\(input)"
+    }
+
+    private func homeRelativeCandidate(from input: String, homePath: String) -> String? {
+        guard
+            !input.hasPrefix("/"),
+            !input.hasPrefix("~"),
+            !input.hasPrefix("file://")
+        else {
+            return nil
+        }
+
+        if input.hasPrefix("./") {
+            return (homePath as NSString).appendingPathComponent(String(input.dropFirst(2)))
+        }
+
+        return (homePath as NSString).appendingPathComponent(input)
     }
 
     private func stripMatchingQuotes(_ input: String) -> String {
